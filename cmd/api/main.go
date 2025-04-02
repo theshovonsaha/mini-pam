@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/theshovonaha/mini-pam/internal/database"
 	"github.com/theshovonaha/mini-pam/internal/server"
 )
 
@@ -19,14 +20,34 @@ func main() {
 	var (
 		port        = flag.Int("port", 8080, "API server port")
 		environment = flag.String("env", "development", "Environment (development|staging|production)")
+		dbHost      = flag.String("db-host", "localhost", "Database host")
+		dbPort      = flag.Int("db-port", 5432, "Database port")
+		dbUser      = flag.String("db-user", "postgres", "Database user")
+		dbPassword  = flag.String("db-password", "postgres", "Database password")
+		dbName      = flag.String("db-name", "securevault", "Database name")
+		dbSSLMode   = flag.String("db-sslmode", "disable", "Database SSL mode")
 	)
 	flag.Parse()
 
 	// Initialize the logger
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
+	// Initialize the database
+	db, err := database.NewConnection(database.Config{
+		Host:     *dbHost,
+		Port:     *dbPort,
+		User:     *dbUser,
+		Password: *dbPassword,
+		DBName:   *dbName,
+		SSLMode:  *dbSSLMode,
+	}, logger)
+	if err != nil {
+		logger.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
 	// Create a new server instance
-	srv := server.NewServer(*environment, logger)
+	srv := server.NewServer(*environment, logger, db)
 
 	// Start the HTTP server
 	httpServer := &http.Server{

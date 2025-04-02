@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/theshovonsaha/mini-pam/internal/database"
+	"github.com/theshovonaha/mini-pam/internal/database"
 )
 
 // RoleRepository handles database operations related to roles

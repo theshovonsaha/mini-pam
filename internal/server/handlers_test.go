@@ -7,12 +7,15 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/theshovonsaha/miniPam/internal/database"
 )
 
 func TestHealthHandler(t *testing.T) {
 	// Create a new server for testing
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	srv := NewServer("test", logger)
+	db := &database.Connection{} // Add a nil database connection for testing
+	srv := NewServer("test", logger, db)
 
 	// Create a request to the health endpoint
 	req, err := http.NewRequest("GET", "/api/v1/health", nil)
@@ -51,7 +54,8 @@ func TestHealthHandler(t *testing.T) {
 func TestVersionHandler(t *testing.T) {
 	// Create a new server for testing
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	srv := NewServer("test", logger)
+	db := &database.Connection{} // Add a nil or mock database connection
+	srv := NewServer("test", logger, db)
 
 	// Create a request to the version endpoint
 	req, err := http.NewRequest("GET", "/api/v1/version", nil)
